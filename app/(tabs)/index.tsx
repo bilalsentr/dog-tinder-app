@@ -1,70 +1,109 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Text, View,Image, TouchableOpacity} from 'react-native'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import { Ionicons } from '@expo/vector-icons'
+import Entypo from '@expo/vector-icons/Entypo';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Router } from '@react-navigation/native';
+import { router,useFocusEffect} from 'expo-router';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const index = () => {
+  const[veri,setVeri]=useState({})
+  const[yeni,setYeni]=useState(0)
+  const[a,seta]=useState(3)
+  const[bio,setbio]=useState([
+    "hav havla gelme",
+    "gökte uçuşan rengarek",
+    "amacı dışında kullanıyorum",
+    "yıldız teknik CENG",
+    "180 cm altı yazmasın",
+    "fitnes & kitap okumak",
+    "yürüyüş yapmak"
+  ])
+  const[isim,setIsım]=useState([
+    "karabaş,3",
+    "stella,8",
+    "Boncuk,4",
+    "Çapkın,5",
+    "chester,4",
+    "pamuk,3",
+    "limon,4"
+  ])
+  const[test,setTest]=useState("")
+  const begen=()=>{
+    setYeni(yeni+1)
+  }
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+
+  const begenme=()=>{
+    setYeni(yeni+1)
+  }
+  const geri=()=>{
+    setYeni(yeni+1)
+  }
+
+  useEffect(()=>{
+    if(AsyncStorage.getItem('girisyapildi')){
+  axios.get('https://dog.ceo/api/breeds/image/random').then((response)=>{
+  setVeri(response.data);
+  seta(Math.floor(Math.random()*7))
+  })
+    }else{
+      router.push('/explore')
+    }
+  
+},[yeni])
+
+useFocusEffect(()=>{
+  const kontrol=async()=>{
+    const girisvarmi=await AsyncStorage.getItem('girisyapildi');
+    if(!girisvarmi){
+        router.push('/explore')
+   }
 }
 
+kontrol();
+
+})
+
+  return (
+    <View style={{paddingTop:60}}>
+      <View>
+        <Text style={{fontSize:45,fontWeight:900,color:'#e24779',textAlign:'center'}}><Fontisto name="fire" size={60} color="#e24779k" />dogder</Text>
+      </View>
+      <View style={{backgroundColor:'white',padding:10,margin:10}}>
+      <Image width={400} height={400} source={{uri:veri.message}}></Image>
+      <View style={{paddingTop:20}}>
+        <Text style={{fontSize:30,fontWeight:30}}>{isim[a]} {test}</Text>
+        <Text style={{height:100,fontSize:21}}>
+        {bio[a]}
+         </Text>
+        </View>
+      </View>
+    <View></View>
+      
+      <View style={styles.aksiyon}>
+        <View style={styles.btn}>
+          <TouchableOpacity onPress={begen}><Entypo name="cross" size={70} color="red" /></TouchableOpacity></View>
+        <View style={styles.btn}>
+          <TouchableOpacity onPress={begenme}><Fontisto name="arrow-return-left" size={70} color="lightblue" /></TouchableOpacity></View>
+        <View style={styles.btn}>
+          <TouchableOpacity onPress={geri}><Ionicons name="heart" size={70} color="green" /></TouchableOpacity></View>
+      </View>
+    </View>
+  )
+}
+
+export default index
+
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  aksiyon:{
+    flexDirection:"row"
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+  btn:{
+    flex:1,
+    alignItems:'center'
+  }
+})
